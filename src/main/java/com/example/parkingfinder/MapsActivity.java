@@ -6,8 +6,10 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -44,13 +46,17 @@ GoogleMap.OnMarkerClickListener{
     private ArrayList<Carpark> carparks;
 
 
-    double earth_radius = 3960.0;
-    double degrees_to_radians = Math.PI/180.0;
-    double radians_to_degrees = 180.0/Math.PI;
+    final double earth_radius = 3960.0;
+    final double degrees_to_radians = Math.PI/180.0;
+    final double radians_to_degrees = 180.0/Math.PI;
 
 
     private Button searchBtn;
     private EditText radiusInput;
+    private ListView carParkList;
+    private static CarParkListViewAdapter adapter;
+
+    private ArrayList<CarparkListDataModel> dataModels;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +73,26 @@ GoogleMap.OnMarkerClickListener{
         searchBtn =  findViewById(R.id.radiusSearchBtn);
 
         radiusInput = findViewById(R.id.radiusInput);
+
+        carParkList = findViewById(R.id.carParkList);
+
+        dataModels = new ArrayList<>();
+
+
+
+//        adapter= new CarParkListViewAdapter(getApplicationContext(), dataModels);
+//
+//        carParkList.setAdapter(adapter);
+//        carParkList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+//                CarparkListDataModel dataModel = dataModels.get(position);
+//                Toast.makeText(getApplicationContext(), dataModel.getCarParkName() + " : "+
+//                        Long.toString(dataModel.getNumberOfSpaces()), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+
+
 
 
 
@@ -104,6 +130,11 @@ GoogleMap.OnMarkerClickListener{
 
     }
 
+
+    private void updateCarParkList()
+    {
+
+    }
 
     private void updateClosestCarParks(final double radius){
 
@@ -160,6 +191,7 @@ GoogleMap.OnMarkerClickListener{
                             mMap.addMarker(new MarkerOptions().position(carpark.getLatLng())
                                     .title(carpark.getName())).setTag(carpark);
 
+                            dataModels.add(new CarparkListDataModel(carpark.getName(), carpark.getNumberOfSpaces()));
 
                         }
                     }
@@ -171,6 +203,19 @@ GoogleMap.OnMarkerClickListener{
                     Toast.makeText(getBaseContext(), "No car parks found", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(getBaseContext(), found + " car parks found", Toast.LENGTH_LONG).show();
+
+
+                    adapter= new CarParkListViewAdapter(getApplicationContext(), dataModels);
+
+                    carParkList.setAdapter(adapter);
+                    carParkList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                            CarparkListDataModel dataModel = dataModels.get(position);
+                            Toast.makeText(getApplicationContext(), dataModel.getCarParkName() + " : "+
+                                    Long.toString(dataModel.getNumberOfSpaces()), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
 
             }
